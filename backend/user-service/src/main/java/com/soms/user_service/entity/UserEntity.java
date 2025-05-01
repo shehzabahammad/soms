@@ -8,7 +8,7 @@ import lombok.Setter;
 @Table(name = "users_data")
 @Getter
 @Setter
-public class UserEntity {
+public class UserEntity extends CommonEntityField {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

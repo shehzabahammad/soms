@@ -1,0 +1,29 @@
+package com.soms.user_service.controller;
+
+import com.soms.user_service.dto.CredentialDtoRequest;
+import com.soms.user_service.dto.CredentialDtoResponse;
+import com.soms.user_service.service.CredentialService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/credential/api/v1")
+public class CredentialController {
+
+    @Autowired
+    private CredentialService credentialService;
+
+    @GetMapping("/ping")
+    public ResponseEntity ping() {
+        return ResponseEntity.ok("PONG");
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<CredentialDtoResponse> registerCredential(@RequestBody CredentialDtoRequest credentialDtoRequest) {
+        var resp = this.credentialService.createCredential(credentialDtoRequest);
+        return ResponseEntity.ok(resp);
+    }
+
+
+}

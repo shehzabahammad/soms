@@ -8,11 +8,12 @@ import lombok.Setter;
 @Table(name = "credential")
 @Getter
 @Setter
-public class CredentialEntity {
+public class CredentialEntity extends CommonEntityField {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(name = "email_id")
     private String emailId;
     private String userName;
     private String password;
