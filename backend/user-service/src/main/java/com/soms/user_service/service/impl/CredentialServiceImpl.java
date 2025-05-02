@@ -2,6 +2,8 @@ package com.soms.user_service.service.impl;
 
 import com.soms.user_service.dto.CredentialDtoRequest;
 import com.soms.user_service.dto.CredentialDtoResponse;
+import com.soms.user_service.dto.LoginDtoRequest;
+import com.soms.user_service.dto.LoginDtoResponse;
 import com.soms.user_service.entity.CredentialEntity;
 import com.soms.user_service.entity.UserEntity;
 import com.soms.user_service.mapper.CredentialMapper;
@@ -9,11 +11,17 @@ import com.soms.user_service.repository.CredentialRepository;
 import com.soms.user_service.repository.UserRepository;
 import com.soms.user_service.service.CredentialService;
 import com.soms.user_service.util.Constants;
+import com.soms.user_service.util.JwtUtils;
 import com.soms.user_service.util.RepositoryUtil;
+import jakarta.transaction.InvalidTransactionException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -46,5 +54,15 @@ public class CredentialServiceImpl implements CredentialService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create credential and user", e);
         }
+    }
+
+    @Override
+    public LoginDtoResponse login(LoginDtoRequest loginDtoRequest) throws InvalidTransactionException {
+        var cred = this.credentialRepository.findByUserName(loginDtoRequest.userName());
+        if (!ObjectUtils.isEmpty(cred) && BCrypt.checkpw(loginDtoRequest.password(), cred.getPassword())) {
+            var token = JwtUtils.generateToken(cred.getUserName());
+            return new LoginDtoResponse(cred.getUserName(), token);
+        }
+        throw new InvalidTransactionException("Invalid credentials");
     }
 }

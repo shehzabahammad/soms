@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CredentialRepository extends JpaRepository<CredentialEntity, Long> {
+    CredentialEntity findByUserName(String userName);
 }
