@@ -3,7 +3,6 @@ package com.soms.user_service.controller;
 import com.soms.user_service.dto.CredentialDtoRequest;
 import com.soms.user_service.dto.CredentialDtoResponse;
 import com.soms.user_service.service.CredentialService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/credential/api/v1")
 public class CredentialController {
 
-    @Autowired
-    private CredentialService credentialService;
+    private final CredentialService credentialService;
+
+    public CredentialController(CredentialService credentialService) {
+        this.credentialService = credentialService;
+    }
 
     @GetMapping("/ping")
     public ResponseEntity ping() {
