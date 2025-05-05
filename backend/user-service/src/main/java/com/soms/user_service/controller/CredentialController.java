@@ -19,11 +19,6 @@ public class CredentialController {
         this.credentialService = credentialService;
     }
 
-    @GetMapping("/ping")
-    public ResponseEntity ping() {
-        return ResponseEntity.ok("PONG");
-    }
-
     @PostMapping("/register")
     public ResponseEntity<CredentialDtoResponse> registerCredential(@RequestBody CredentialDtoRequest credentialDtoRequest) {
         var resp = this.credentialService.createCredential(credentialDtoRequest);

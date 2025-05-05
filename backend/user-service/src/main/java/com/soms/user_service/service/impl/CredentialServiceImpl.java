@@ -30,6 +30,7 @@ public class CredentialServiceImpl implements CredentialService {
     private final UserRepository userRepository;
     private final CredentialMapper credentialMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     @Override
     @Transactional
@@ -60,7 +61,7 @@ public class CredentialServiceImpl implements CredentialService {
     public LoginDtoResponse login(LoginDtoRequest loginDtoRequest) throws InvalidTransactionException {
         var cred = this.credentialRepository.findByUserName(loginDtoRequest.userName());
         if (!ObjectUtils.isEmpty(cred) && BCrypt.checkpw(loginDtoRequest.password(), cred.getPassword())) {
-            var token = JwtUtils.generateToken(cred.getUserName());
+            var token = this.jwtUtils.generateToken(cred.getUserName());
             return new LoginDtoResponse(cred.getUserName(), token);
         }
         throw new InvalidTransactionException("Invalid credentials");
