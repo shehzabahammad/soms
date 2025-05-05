@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/credential/api/v1")
+@RequestMapping("/api/v1/credential")
 public class CredentialController {
 
     private final CredentialService credentialService;
