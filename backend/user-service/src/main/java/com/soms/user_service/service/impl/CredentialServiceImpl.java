@@ -61,8 +61,8 @@ public class CredentialServiceImpl implements CredentialService {
     public LoginDtoResponse login(LoginDtoRequest loginDtoRequest) throws InvalidTransactionException {
         var cred = this.credentialRepository.findByUserName(loginDtoRequest.userName());
         if (!ObjectUtils.isEmpty(cred) && BCrypt.checkpw(loginDtoRequest.password(), cred.getPassword())) {
-            var token = this.jwtUtils.generateToken(cred.getUserName());
-            return new LoginDtoResponse(cred.getUserName(), token);
+            var token = this.jwtUtils.generateToken(cred);
+            return new LoginDtoResponse(String.valueOf(cred.getId()), token);
         }
         throw new InvalidTransactionException("Invalid credentials");
     }

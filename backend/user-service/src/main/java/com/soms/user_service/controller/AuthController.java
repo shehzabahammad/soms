@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-public class CredentialController {
+public class AuthController {
 
     private final CredentialService credentialService;
 
-    public CredentialController(CredentialService credentialService) {
+    public AuthController(CredentialService credentialService) {
         this.credentialService = credentialService;
     }
 

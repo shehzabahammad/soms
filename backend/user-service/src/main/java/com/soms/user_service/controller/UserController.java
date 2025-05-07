@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity getProfileDetails(@PathVariable String id) {
-        return null;
+        return ResponseEntity.ok("Profile Details for User ID: " + id);
     }
 }

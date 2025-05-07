@@ -1,5 +1,6 @@
 package com.soms.gateway_service.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -12,17 +13,28 @@ import java.util.List;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    private static final List<String> openEndpoints = List.of("/user/api/v1/ping", "/user/api/v1/auth/login");
+    @Value("${gateway.open-endpoints}")
+    private List<String> openEndpoints;
 
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, JwtAuthenticationManager jwtAuthenticationManager) {
+    public JwtAuthenticationManager jwtAuthenticationManager() {
+        return new JwtAuthenticationManager();
+    }
+
+    @Bean
+    public JwtSecurityContext jwtSecurityContext() {
+        return new JwtSecurityContext();
+    }
+
+    @Bean
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, JwtAuthenticationManager jwtAuthenticationManager, JwtSecurityContext jwtSecurityContext) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(openEndpoints.toArray(new String[0])).permitAll()
                         .anyExchange().authenticated())
-                .authenticationManager(new JwtAuthenticationManager())
-                .securityContextRepository(new JwtSecurityContext())
+                .authenticationManager(jwtAuthenticationManager)
+                .securityContextRepository(jwtSecurityContext)
                 .build();
     }
 }
