@@ -1,10 +1,12 @@
 package com.soms.gateway_service.config;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -20,30 +22,40 @@ public class UserContextFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
-
-        // Skip if the path starts with any of the open endpoints
         boolean isOpenEndpoint = openEndpoints.stream().anyMatch(path::startsWith);
+
         if (isOpenEndpoint) {
             return chain.filter(exchange);
         }
 
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .switchIfEmpty(Mono.empty())
-                .flatMap(authentication -> {
-                    if (authentication != null && authentication.isAuthenticated()) {
-                        String userId = authentication.getName();
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return chain.filter(exchange); // or reject request
+        }
 
-                        ServerWebExchange mutatedExchange = exchange.mutate()
-                                .request(exchange.getRequest().mutate()
-                                        .header("X-User-Id", userId)
-                                        .build())
-                                .build();
+        String token = authHeader.substring(7); // Remove "Bearer "
 
-                        return chain.filter(mutatedExchange);
-                    }
+        try {
+            DecodedJWT jwt = JWT.decode(token);
 
-                    return chain.filter(exchange);
-                });
+            String userId = String.valueOf(jwt.getClaim("userId").asInt());
+            String role = jwt.getClaim("role").asString();
+            String email = jwt.getClaim("emailId").asString();
+            String userName = jwt.getClaim("userName").asString();
+
+            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                    .header("X-User-Id", userId)
+                    .header("X-User-Role", role)
+                    .header("X-User-Email", email)
+                    .header("X-User-Username", userName)
+                    .build();
+
+            ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
+            return chain.filter(mutatedExchange);
+
+        } catch (Exception e) {
+            // Optionally log and reject malformed token
+            return chain.filter(exchange);
+        }
     }
 }
