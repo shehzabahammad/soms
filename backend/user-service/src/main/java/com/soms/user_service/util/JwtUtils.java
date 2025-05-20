@@ -28,7 +28,7 @@ public class JwtUtils {
     public String generateToken(CredentialEntity credentialEntity) {
         return JWT.create()
                 .withSubject(credentialEntity.getUserName())
-                .withClaim("userId", credentialEntity.getId())
+                .withClaim("id", credentialEntity.getId().toString())
                 .withClaim("role", credentialEntity.getRole())
                 .withClaim("userName", credentialEntity.getUserName())
                 .withClaim("emailId", credentialEntity.getEmailId())

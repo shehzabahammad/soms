@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "credential")
 @Getter
@@ -11,10 +13,11 @@ import lombok.Setter;
 public class CredentialEntity extends CommonEntityField {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column(name = "email_id")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    @Column(name = "email_id", unique = true)
     private String emailId;
+    @Column(unique = true)
     private String userName;
     private String password;
     private String firstName;

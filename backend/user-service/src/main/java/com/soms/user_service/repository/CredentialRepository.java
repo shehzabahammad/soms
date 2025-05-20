@@ -7,4 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CredentialRepository extends JpaRepository<CredentialEntity, Long> {
     CredentialEntity findByUserName(String userName);
+
+    Boolean existsByUserName(String userName);
+
+    Boolean existsByEmailId(String email);
 }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users_data")
 @Getter
@@ -11,8 +13,8 @@ import lombok.Setter;
 public class UserEntity extends CommonEntityField {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     @OneToOne
     @JoinColumn(name = "credential_id", referencedColumnName = "id", nullable = false)
     private CredentialEntity credential;

@@ -36,6 +36,12 @@ public class CredentialServiceImpl implements CredentialService {
     @Transactional
     public CredentialDtoResponse createCredential(CredentialDtoRequest credentialDtoRequest) {
         try {
+            if (this.credentialRepository.existsByEmailId(credentialDtoRequest.emailId())) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+            if (this.credentialRepository.existsByUserName(credentialDtoRequest.userName())) {
+                throw new IllegalArgumentException("Username already exists");
+            }
             CredentialEntity credentialEntity = this.credentialMapper.toEntity(credentialDtoRequest);
             credentialEntity.setRole(Constants.ROLE_USER);
             credentialEntity.setEnabled(true);
@@ -52,6 +58,8 @@ public class CredentialServiceImpl implements CredentialService {
             userRepository.save(userEntity);
 
             return this.credentialMapper.toDtoResponse(credentialEntity);
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create credential and user", e);
         }

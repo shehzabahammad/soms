@@ -38,13 +38,13 @@ public class UserContextFilter implements GlobalFilter {
         try {
             DecodedJWT jwt = JWT.decode(token);
 
-            String userId = String.valueOf(jwt.getClaim("userId").asInt());
+            String id = jwt.getClaim("id").asString();
             String role = jwt.getClaim("role").asString();
             String email = jwt.getClaim("emailId").asString();
             String userName = jwt.getClaim("userName").asString();
 
             ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                    .header("X-User-Id", userId)
+                    .header("X-User-Id", id)
                     .header("X-User-Role", role)
                     .header("X-User-Email", email)
                     .header("X-User-Username", userName)
